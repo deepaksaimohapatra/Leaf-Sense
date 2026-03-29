@@ -10,7 +10,6 @@ venv/
 
 # Data & Models
 data/
-models_saved/
 temp_uploads/*
 !temp_uploads/.gitkeep
 
