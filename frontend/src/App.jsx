@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://hydroponic-accursedly-shela.ngrok-free.dev';
+const API_BASE_URL = 'https://leaf-sense-kr7k.onrender.com';
 
 const PLANTS = [
   { id: 'apple', name: 'Apple', icon: '🍎' },
