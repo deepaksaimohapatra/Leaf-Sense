@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://hydroponic-accursedly-shela.ngrok-free.dev';
 
 const PLANTS = [
   { id: 'apple', name: 'Apple', icon: '🍎' },
@@ -36,7 +36,11 @@ function App() {
     formData.append('confirmed_plant', selectedPlant);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/diagnose-health`, formData);
+      const response = await axios.post(`${API_BASE_URL}/diagnose-health`, formData, {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
       if (response.data.status === 'success') {
         setDiagnosis(response.data.data);
         setStep('diagnosis');
@@ -62,15 +66,15 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-900 text-white font-sans selection:bg-primary-500 selection:text-white">
       {/* Header */}
-      <header className="py-8 px-6 text-center border-b border-white/5 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50">
+      <header className="py-6 md:py-8 px-4 md:px-6 text-center border-b border-white/5 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-primary-400 to-emerald-400 bg-clip-text text-transparent mb-2">
           LEAF SENSE
         </h1>
         <p className="text-slate-400 text-lg">Intelligent Leaf Diagnosis & Plant Care</p>
       </header>
 
-      <main className="max-w-4xl mx-auto py-12 px-6">
-        <div className="bg-slate-800/40 border border-white/10 rounded-3xl p-8 backdrop-blur-md shadow-2xl">
+      <main className="max-w-4xl mx-auto py-6 md:py-12 px-4 md:px-6">
+        <div className="bg-slate-800/40 border border-white/10 rounded-2xl md:rounded-3xl p-4 md:p-8 backdrop-blur-md shadow-2xl">
 
           {error && (
             <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center justify-center gap-3 animate-pulse">
@@ -116,7 +120,7 @@ function App() {
                         setSelectedPlant(p.id);
                         setStep('upload');
                       }}
-                      className="group p-8 bg-white/5 border border-white/10 rounded-4xl hover:border-primary-500/50 hover:bg-primary-500/5 transition-all text-center space-y-4 active:scale-95"
+                      className="group p-6 md:p-8 bg-white/5 border border-white/10 rounded-3xl md:rounded-4xl hover:border-primary-500/50 hover:bg-primary-500/5 transition-all text-center space-y-4 active:scale-95"
                     >
                       <div className="text-5xl group-hover:scale-110 transition-transform">{p.icon}</div>
                       <div className="text-xl font-bold">{p.name}</div>
@@ -139,12 +143,12 @@ function App() {
                 </div>
 
                 <div
-                  className={`group relative border-2 border-dashed rounded-4xl p-12 text-center transition-all cursor-pointer overflow-hidden ${preview ? 'border-primary-500/40 bg-primary-500/5' : 'border-white/10 hover:border-primary-500/30 hover:bg-white/5'
+                  className={`group relative border-2 border-dashed rounded-3xl md:rounded-4xl p-8 md:p-12 text-center transition-all cursor-pointer overflow-hidden ${preview ? 'border-primary-500/40 bg-primary-500/5' : 'border-white/10 hover:border-primary-500/30 hover:bg-white/5'
                     }`}
                   onClick={() => document.getElementById('file-upload').click()}
                 >
                   {preview ? (
-                    <img src={preview} alt="Preview" className="w-full h-64 object-cover rounded-2xl shadow-lg brightness-90 group-hover:brightness-100 transition-all duration-500" />
+                    <img src={preview} alt="Preview" className="w-full h-48 md:h-64 object-cover rounded-2xl shadow-lg brightness-90 group-hover:brightness-100 transition-all duration-500" />
                   ) : (
                     <div className="space-y-4">
                       <div className="w-20 h-20 bg-primary-500/10 rounded-3xl flex items-center justify-center mx-auto text-primary-400 group-hover:scale-110 group-hover:bg-primary-500/20 transition-all duration-500">
@@ -180,17 +184,17 @@ function App() {
               <div className="w-full text-center space-y-10 animate-in slide-in-from-top-4 fade-in duration-1000">
                 <div className="relative inline-block">
                   <div className={`absolute inset-0 blur-3xl rounded-full ${diagnosis.prediction === 'Healthy' ? 'bg-emerald-500/30' : 'bg-red-500/30'}`}></div>
-                  <div className={`relative px-12 py-6 rounded-4xl border-2 backdrop-blur-2xl ${diagnosis.prediction === 'Healthy'
+                  <div className={`relative px-6 md:px-12 py-6 rounded-3xl md:rounded-4xl border-2 backdrop-blur-2xl ${diagnosis.prediction === 'Healthy'
                     ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
                     : 'bg-red-500/10 border-red-500/30 text-red-400'
                     }`}>
                     <div className="uppercase tracking-widest text-xs font-black mb-2">Final Diagnosis</div>
-                    <h2 className="text-6xl font-black">{diagnosis.prediction}</h2>
+                    <h2 className="text-4xl md:text-6xl font-black">{diagnosis.prediction}</h2>
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-8 text-left">
-                  <div className="bg-white/5 border border-white/10 p-6 rounded-3xl space-y-4">
+                <div className="grid md:grid-cols-2 gap-8 text-left mb-8">
+                  <div className="bg-white/5 border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-3xl space-y-4">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500">Diagnosis Details</h3>
                     <div className="space-y-4">
                       <div className="flex justify-between items-end">
@@ -206,13 +210,91 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="bg-white/5 border border-white/10 p-6 rounded-3xl space-y-4">
+                  <div className="bg-white/5 border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-3xl space-y-4">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500">Leaf Analysis</h3>
                     <div className="aspect-video w-full rounded-2xl overflow-hidden grayscale-[0.5] opacity-80 border border-white/10">
                       <img src={preview} alt="Analyzed Leaf" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
+
+                {diagnosis.recommendation && (
+                  <div className="text-left bg-white/5 border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-3xl mb-8 space-y-6 animate-in slide-in-from-bottom-4 fade-in duration-700">
+                    <h3 className="text-lg font-bold uppercase tracking-widest pb-4 border-b border-white/10 flex items-center gap-3">
+                      {diagnosis.prediction === 'Healthy' 
+                        ? <><span className="text-emerald-400">Optimal Plant Care Guidelines</span></> 
+                        : <><span className="text-red-400">Treatment & Recovery Plan</span></>}
+                    </h3>
+                    
+                    {diagnosis.recommendation.status === 'Optimal' ? (
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-400 uppercase mb-2">Maintenance</h4>
+                          <ul className="list-disc pl-5 text-slate-300 space-y-1 text-sm">
+                            {diagnosis.recommendation.guidelines?.maintenance_tips?.map((t, i) => <li key={i}>{t}</li>)}
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-400 uppercase mb-2">Fertilizer</h4>
+                          <ul className="list-disc pl-5 text-slate-300 space-y-1 text-sm">
+                            {diagnosis.recommendation.guidelines?.fertilizer_suggestions?.map((t, i) => <li key={i}>{t}</li>)}
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-400 uppercase mb-2">Watering & Sunlight</h4>
+                          <ul className="list-disc pl-5 text-slate-300 space-y-1 text-sm">
+                            <li>{diagnosis.recommendation.guidelines?.watering_schedule}</li>
+                            <li>{diagnosis.recommendation.guidelines?.sunlight_requirements}</li>
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-400 uppercase mb-2">Yield Tips</h4>
+                          <ul className="list-disc pl-5 text-slate-300 space-y-1 text-sm">
+                            {diagnosis.recommendation.guidelines?.yield_improvement_tips?.map((t, i) => <li key={i}>{t}</li>)}
+                          </ul>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-bold text-red-400 uppercase">Possible Causes</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {diagnosis.recommendation.causes?.map((c, i) => (
+                              <span key={i} className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-300 text-sm rounded-full">{c}</span>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-bold text-emerald-400 uppercase flex items-center gap-2">
+                              <span className="text-xl">🌿</span> Organic Solutions
+                            </h4>
+                            <ul className="list-disc pl-5 text-slate-300 space-y-1 text-sm">
+                              {diagnosis.recommendation.solutions?.organic?.map((s, i) => <li key={i}>{s}</li>)}
+                            </ul>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-bold text-amber-400 uppercase flex items-center gap-2">
+                              <span className="text-xl">🧪</span> Chemical Treatment
+                            </h4>
+                            <ul className="list-disc pl-5 text-slate-300 space-y-1 text-sm">
+                              {diagnosis.recommendation.solutions?.chemical?.map((s, i) => <li key={i}>{s}</li>)}
+                            </ul>
+                          </div>
+                        </div>
+
+                        <div className="bg-primary-500/10 border border-primary-500/20 p-4 rounded-2xl">
+                          <h4 className="text-sm font-bold text-primary-400 uppercase mb-2">Future Prevention</h4>
+                          <ul className="list-disc pl-5 text-primary-300 space-y-1 text-sm">
+                            {diagnosis.recommendation.prevention_tips?.map((p, i) => <li key={i}>{p}</li>)}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <button
                   onClick={reset}

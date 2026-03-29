@@ -1,0 +1,13 @@
+# Stop heavy folders from bogging down the final Docker image
+frontend/
+node_modules/
+.git/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+temp_uploads/
+.env
+data/
+datasets/
+notebooks/
+# You only want the api/ and src/ directories moving into the backend container
