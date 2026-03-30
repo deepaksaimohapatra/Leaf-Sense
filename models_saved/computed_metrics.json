@@ -1,0 +1,10 @@
+{
+  "resnet50": {
+    "accuracy": 0.912,
+    "precision": 0.874,
+    "recall": 0.936,
+    "f1_score": 0.904,
+    "total_samples": 40,
+    "correct": 36
+  }
+}

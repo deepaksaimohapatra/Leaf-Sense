@@ -2,11 +2,19 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const API_BASE_URL = 'https://leaf-sense-kr7k.onrender.com';
+// const API_BASE_URL = 'http://localhost:8000'; // Using local backend
 
 const PLANTS = [
   { id: 'apple', name: 'Apple', icon: '🍎' },
   { id: 'tomato', name: 'Tomato', icon: '🍅' },
   { id: 'potato', name: 'Potato', icon: '🥔' },
+];
+
+const MODELS = [
+  { id: 'resnet50', name: 'ResNet-50 (Default)' },
+  { id: 'cnn', name: 'Custom CNN' },
+  { id: 'mobilenet', name: 'MobileNet (Fast)' },
+  { id: 'efficientnet', name: 'EfficientNet (Accurate)' }
 ];
 
 function App() {
@@ -15,6 +23,7 @@ function App() {
   const [step, setStep] = useState('select'); // select, upload, diagnosis
   const [loading, setLoading] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState(null);
+  const [selectedModel, setSelectedModel] = useState('resnet50');
   const [diagnosis, setDiagnosis] = useState(null);
   const [error, setError] = useState(null);
 
@@ -34,6 +43,7 @@ function App() {
     const formData = new FormData();
     formData.append('image', image);
     formData.append('confirmed_plant', selectedPlant);
+    formData.append('model', selectedModel);
 
     try {
       const response = await axios.post(`${API_BASE_URL}/diagnose-health`, formData, {
@@ -59,6 +69,7 @@ function App() {
     setPreview(null);
     setStep('select');
     setSelectedPlant(null);
+    setSelectedModel('resnet50');
     setDiagnosis(null);
     setError(null);
   };
@@ -163,6 +174,20 @@ function App() {
                   <input id="file-upload" type="file" className="hidden" onChange={handleImageChange} accept="image/*" />
                 </div>
 
+                <div className="w-full text-left space-y-2">
+                  <label className="text-sm font-bold text-slate-400 uppercase tracking-wider ml-2">Select Classification Model</label>
+                  <select
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value)}
+                    className="w-full bg-slate-800 border border-white/10 rounded-2xl px-4 py-3 text-white focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all appearance-none cursor-pointer hover:border-white/20"
+                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.2em' }}
+                  >
+                    {MODELS.map(m => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+
                 <button
                   disabled={!image || loading}
                   onClick={diagnoseHealth}
@@ -205,7 +230,7 @@ function App() {
                         <div className={`h-full transition-all duration-1000 ${diagnosis.prediction === 'Healthy' ? 'bg-emerald-500' : 'bg-red-500'}`} style={{ width: `${diagnosis.confidence * 100}%` }}></div>
                       </div>
                       <p className="text-sm text-slate-400 italic">
-                        The current phase uses binary classification optimized for {PLANTS.find(p => p.id === selectedPlant)?.name} leaf images.
+                        The prediction was made using the {MODELS.find(m => m.id === selectedModel)?.name} algorithm optimized for {PLANTS.find(p => p.id === selectedPlant)?.name} leaf images.
                       </p>
                     </div>
                   </div>
@@ -217,6 +242,41 @@ function App() {
                     </div>
                   </div>
                 </div>
+
+                {diagnosis.metrics_chart_base64 ? (
+                  <div className="bg-white/5 border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-3xl mb-8 flex justify-center items-center overflow-hidden animate-in slide-in-from-bottom-2 fade-in duration-700 delay-100">
+                    <img src={`data:image/png;base64,${diagnosis.metrics_chart_base64}`} alt="Model Performance Metrics" className="w-full max-w-lg h-auto drop-shadow-2xl mix-blend-screen opacity-100" />
+                  </div>
+                ) : diagnosis.metrics && (
+                  <div className="bg-white/5 border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-3xl mb-8 space-y-6 text-left animate-in slide-in-from-bottom-2 fade-in duration-700 delay-100">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500">Model Performance Graph</h3>
+                    <div className="space-y-4">
+                      {Object.entries(diagnosis.metrics).map(([key, value]) => {
+                        const score = value * 100;
+                        const label = key.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        let colorClass = 'bg-primary-500';
+                        if (score >= 95) colorClass = 'bg-emerald-500';
+                        else if (score >= 90) colorClass = 'bg-emerald-400';
+                        else if (score >= 85) colorClass = 'bg-primary-400';
+                        else colorClass = 'bg-amber-400';
+
+                        return (
+                          <div key={key} className="space-y-1">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-bold text-slate-400 tracking-wider w-24 truncate">{label}</span>
+                              <div className="flex-1 mx-4">
+                                <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden shadow-inner">
+                                  <div className={`h-full transition-all duration-1000 ${colorClass}`} style={{ width: `${score}%` }}></div>
+                                </div>
+                              </div>
+                              <span className="text-sm font-bold text-slate-200 text-right w-12">{score.toFixed(1)}%</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {diagnosis.recommendation && (
                   <div className="text-left bg-white/5 border border-white/10 p-4 md:p-6 rounded-2xl md:rounded-3xl mb-8 space-y-6 animate-in slide-in-from-bottom-4 fade-in duration-700">
